@@ -63,7 +63,7 @@ def getResult(inputSTR, utterance, args, resultDICT, refDICT, pattern=""):
 
     if utterance == "[可以]設定幾[個][LINE][帳號]":
         if CHATBOT_MODE:
-            if args[2] == 'line' and args[3] == '帳號':
+            if args[2] == 'line' and args[3] in ['帳號', '帳戶']:
                 resultDICT["response"] = getResponse(utterance, args)
         else:
             pass
@@ -91,6 +91,19 @@ def getResult(inputSTR, utterance, args, resultDICT, refDICT, pattern=""):
     if utterance == "如何設定[LINE]個人化通知":
         if CHATBOT_MODE:
             if args[0] == 'line':
+                resultDICT["response"] = getResponse(utterance, args)
+        else:
+            pass
+    if utterance == "[Line][可以]設定幾[個][帳號]":
+        if CHATBOT_MODE:
+            if args[0] == 'line' and args[3] in ['帳號', '帳戶']:
+                resultDICT["response"] = getResponse(utterance, args)
+        else:
+            pass
+
+    if utterance == "[LINE][帳號][可以]設定幾[個]？":
+        if CHATBOT_MODE:
+            if args[0] == 'line' and args[1] in ['帳號', '帳戶']:
                 resultDICT["response"] = getResponse(utterance, args)
         else:
             pass

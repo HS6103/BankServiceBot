@@ -37,9 +37,14 @@ def get_relevant_doc(outputLIST):
     
     # 使用 max() 函數尋找分數最大的條目，並返回對應的字串
     max_entry = max(outputLIST, key=lambda x: x[1])
+    max_score = max_entry[1]
     
-    # 返回對應的字串
-    max_string = re.sub(r"^[a-z_]+>>\n.+?:", "", max_entry[0]).strip("\n")
+    if max_score < 5:
+        max_string = ''
+    else:
+        # 返回對應的字串
+        max_string = re.sub(r"^[a-z_]+>>\n", "", max_entry[0]).strip("\n")
+        
     
     return max_string
 

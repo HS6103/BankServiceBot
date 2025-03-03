@@ -8,6 +8,7 @@ import re
 import logging
 import subprocess
 from esun_qa import execLoki
+from openai import OpenAI
 
 # 載入 json 標準函式庫，處理回傳的資料格式
 import json
@@ -17,6 +18,47 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
 
+
+try:
+    with open("account.info", encoding="utf-8") as f:
+        accountDICT = json.load(f)
+        username = accountDICT['username']
+        gpt_key = accountDICT['gpt_key']
+        
+except Exception as e:
+    print(f"ERROR: {e}")
+
+# load ChatGPT credentials
+api_key = gpt_key
+client = OpenAI(api_key = gpt_key)
+
+# 讀取 messages 模板
+def load_message_template(file_path="gpt.json"):
+    with open(file_path, "r", encoding="utf-8") as f:
+        return json.load(f)["messages"]
+
+# 使用 GPT 生成回應
+def get_gpt_response(msgSTR, docSTR):
+    # 解析 docSTR，分為 Q 和 A
+    Q, A = docSTR.split(':', 1)[0], docSTR.split(':', 1)[1]
+    
+    # 讀取並格式化 messages
+    message_template = load_message_template()
+    messages = []
+    for message in message_template:
+        content = message["content"].format(Q=Q, A=A, msgSTR=msgSTR)  # 動態替換佔位符
+        messages.append({"role": message["role"], "content": content})
+    
+    # 使用 GPT API
+    completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+    )
+    
+    # 獲取回應
+    return completion.choices[0].message.content.strip()
+
+# Webhook
 app = Flask(__name__)
 
 @app.route("/", methods=['POST'])
@@ -73,7 +115,11 @@ def linebot():
                             line_bot_api.reply_message(tk,TextSendMessage(reply))                                           # 回傳訊息
                             
                     else:
-                        reply = subprocess.run(['python','bank_toaster.py',"--msg", msg],capture_output=True, text=True, encoding="utf-8").stdout # 從copytoaster取得文件
+                        docSTR = subprocess.run(['python','bank_toaster.py',"--msg", msg],capture_output=True, text=True, encoding="utf-8").stdout.strip() # 從copytoaster取得文件
+                        if docSTR == '':
+                            reply = "抱歉，我只是個機器人，沒辦法回答喔"         # 回傳沒有答案時的預設回覆字串
+                        else:
+                            reply = get_gpt_response(msg, docSTR)             # ChatGPT 產生回覆
                         line_bot_api.reply_message(tk,TextSendMessage(reply)) # 回傳訊息
                             
                 except Exception as e:
@@ -88,9 +134,9 @@ def linebot():
             
     except Exception as e:
         print("[ERROR] => {}".format(str(e)))
-        print(body)                                                                        # 如果發生錯誤，印出收到的內容
-        json_data = json.loads(body)                                                       # json 格式化訊息內容
-        reply = "抱歉發生一些問題，請再試一次"   # 錯誤時回覆
+        print(body)                                                                       # 如果發生錯誤，印出收到的內容
+        json_data = json.loads(body)                                                      # json 格式化訊息內容
+        reply = "抱歉發生一些問題，請再試一次"                                              # 錯誤時回覆
         if json_data['events'] != []:
             line_bot_api.push_message(json_data['events'][0]['source']['userId'],TextSendMessage(reply)) # 回傳訊息
         
