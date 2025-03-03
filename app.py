@@ -86,10 +86,12 @@ def linebot():
             splitLIST = ["！", "。", "？", "!", ",", "\n", "；", "\u3000", ";"]
             refDICT = {}
             
-            if msg.lower() in ["哈囉","嗨","你好","您好","hi","hello"]:
-                line_bot_api.reply_message(tk,TextSendMessage(msg + "!\n" + "我是銀行客服機器人\n請問您今天想問什麼呢?"))                                                        # 回傳文字訊息                
+            helloLIST = ["哈囉","嗨","你好","您好","hi","hello"]
+            byeLIST = ["掰掰","掰","88","bye bye","bye","再見", "沒有", "拜拜"]
+            if any(keyword in msg.lower() for keyword in helloLIST):
+                line_bot_api.reply_message(tk,TextSendMessage("Hi!\n" + "我是銀行客服機器人\n請問您今天想問什麼呢?"))                                                        # 回傳文字訊息                
                 
-            elif msg.lower() in ["掰掰","掰","88","bye bye","bye","再見", "沒有", "拜拜"]:
+            elif any(keyword in msg.lower() for keyword in byeLIST):
                 line_bot_api.reply_message(tk,TextSendMessage("掰掰，謝謝您的使用，期待下次為您服務!"))                                                        # 回傳文字訊息                
                 
             else:
