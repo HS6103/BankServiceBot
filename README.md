@@ -14,7 +14,8 @@
 
 + Python 3.11
 + Flask + Docker (Deployed on Heroku)
-+ 卓騰語言科技 Loki 語意理解引擎 (請參考[官方文件](https://api.droidtown.co/document/#Loki))
++ 卓騰語言科技 Loki 語意理解引擎 / Copytoaster 文件搜尋 (請參考[官方文件](https://api.droidtown.co/document/#Loki))
++ OpenAI API
 
 ## 檔案內容
 
