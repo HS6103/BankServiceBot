@@ -7,3 +7,6 @@ line_credit.json
 ngrok.exe
 *.png
 ngrok_link.txt
+/copytoasterfiles
+intent_new
+backup_*
