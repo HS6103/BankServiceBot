@@ -1,0 +1,9 @@
+inputSTR.txt
+.DS_*
+__pycache__
+ngrok.exe
+*.png
+ngrok_link.txt
+/copytoasterfiles
+intent_new
+backup_*
